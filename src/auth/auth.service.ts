@@ -31,7 +31,7 @@ export class AuthService {
             const payload = { username: User.mail, sub: User.id };
 
             return {
-                access_token: this.jwtService.sign(payload),
+                access_token: this.jwtService.sign(payload), user: User
             };
         }
     }
@@ -40,7 +40,8 @@ export class AuthService {
         const { Pass } = body
         const user = await this.organService.login(body);
         const match = await bcrypt.compare(Pass, user.pass);
-        if (user && match) {
+
+        if (user && Pass === match) {
             const { pass, ...result } = user;
             return result;
         }
@@ -53,7 +54,7 @@ export class AuthService {
             const payload = { username: Organ.mail, sub: Organ.id };
 
             return {
-                access_token: this.jwtService.sign(payload),
+                access_token: this.jwtService.sign(payload), organisateur: Organ
             };
         }
     }

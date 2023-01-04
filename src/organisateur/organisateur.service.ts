@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateOrganisateurDto } from './dto/create-organisateur.dto';
 import { UpdateOrganisateurDto } from './dto/update-organisateur.dto';
 import { Organisateur } from './entities/organisateur.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class OrganisateurService {
@@ -14,8 +15,10 @@ export class OrganisateurService {
     private readonly organRepository: Repository<Organisateur>,
   ) { }
 
-  create(createOrganisateurDto: CreateOrganisateurDto) {
-    const organ = this.organRepository.create(createOrganisateurDto);
+  async create(createOrganisateurDto: CreateOrganisateurDto) {
+    const { pass } = createOrganisateurDto;
+    const hash = await bcrypt.hash(pass, 10);
+    const organ = this.organRepository.create({ ...createOrganisateurDto, pass: hash });
     return this.organRepository.save(organ);
   }
 
@@ -37,9 +40,12 @@ export class OrganisateurService {
   }
 
   async update(id: string, updateOrganisateurDto: UpdateOrganisateurDto) {
+    const { pass } = updateOrganisateurDto;
+    const hash = await bcrypt.hash(pass, 10);
     const organ = await this.organRepository.preload({
       id: +id,
       ...updateOrganisateurDto,
+      pass: hash
     });
     if (!organ) {
       throw new NotFoundException(`organ #${id} not found`)
