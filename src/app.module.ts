@@ -12,6 +12,8 @@ import { Organisateur } from './organisateur/entities/organisateur.entity';
 import { Admin } from './admin/entities/admin.entity';
 import { UserModule } from './user/user.module';
 import { TicketModule } from './ticket/ticket.module';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [EventModule,
@@ -30,6 +32,8 @@ import { TicketModule } from './ticket/ticket.module';
     AdminModule,
     UserModule,
     TicketModule,
+    ConfigModule.forRoot(),
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DataQueryDto } from 'src/common/dto/data-query.dto/data-query.dto';
 import { Repository } from 'typeorm';
 import { CreateOrganisateurDto } from './dto/create-organisateur.dto';
 import { UpdateOrganisateurDto } from './dto/update-organisateur.dto';
@@ -26,7 +27,7 @@ export class OrganisateurService {
 
   async findOne(id: string) {
     const organ = await this.organRepository.findOne({
-      where: { Id: parseInt(id) },
+      where: { id: parseInt(id) },
       relations: ['Events']
     });
     if (!organ) {
@@ -37,7 +38,7 @@ export class OrganisateurService {
 
   async update(id: string, updateOrganisateurDto: UpdateOrganisateurDto) {
     const organ = await this.organRepository.preload({
-      Id: +id,
+      id: +id,
       ...updateOrganisateurDto,
     });
     if (!organ) {
@@ -49,5 +50,17 @@ export class OrganisateurService {
   async remove(id: string) {
     const organ = await this.findOne(id);
     return this.organRepository.remove(organ)
+  }
+
+  async login(body: DataQueryDto): Promise<Organisateur | undefined> {
+    const { Mail } = body
+    const user = await this.organRepository.findOne({
+      where: { mail: Mail }
+    });
+
+    if (user) {
+      return Promise.resolve(user)
+    }
+    return undefined
   }
 }

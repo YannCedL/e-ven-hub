@@ -1,21 +1,20 @@
 import { Organisateur } from "src/organisateur/entities/organisateur.entity";
 import { Ticket } from "src/ticket/entities/ticket.entity";
-import { User } from "src/user/entities/user.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Event {
     @PrimaryGeneratedColumn()
-    Id: number;
+    id: number;
 
     @Column()
-    Title: string;
+    title: string;
 
     @Column()
-    Description: string;
+    description: string;
 
     @Column()
-    Date: string;
+    date: string;
 
     @Column()
     statut: string;

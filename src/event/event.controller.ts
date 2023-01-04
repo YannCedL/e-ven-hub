@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { Request } from '@nestjs/common/decorators';
+import { request } from 'http';
 
 @Controller('event')
 export class EventController {
@@ -15,6 +17,10 @@ export class EventController {
   @Get()
   findAll() {
     return this.eventService.findAll();
+  }
+  @Get('/organisateur')
+  findAllMile(id: number) {
+    return this.findAllMile(id)
   }
 
   @Get(':id')

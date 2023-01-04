@@ -3,9 +3,9 @@ import { IsNumber, IsString } from "class-validator";
 export class CreateTicketDto {
 
     @IsNumber()
-    readonly Prix: number;
+    readonly prix: number;
 
     @IsNumber()
-    EventId: number;
+    eventId: number;
 
 }

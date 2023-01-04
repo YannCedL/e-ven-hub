@@ -6,10 +6,10 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class Ticket {
     @PrimaryGeneratedColumn()
-    Id: number;
+    id: number;
 
     @Column()
-    Prix: number;
+    prix: number;
 
     @ManyToOne(type => Event, event => event.tickets, { cascade: true })
     Event: Event;

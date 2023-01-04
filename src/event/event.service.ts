@@ -37,9 +37,21 @@ export class EventService {
     });
   }
 
+  async findAllMine(id: number) {
+    const organ = await this.preloadOrganById(id)
+    const event = await this.eventRepository.findOne({
+      where: { Organisateur: organ },
+      relations: ['Organisateur', 'tickets']
+    });
+    if (!event) {
+      throw new NotFoundException(`Event #${id}`)
+    }
+    return event;
+  }
+
   async findOne(id: string) {
     const event = await this.eventRepository.findOne({
-      where: { Id: parseInt(id) },
+      where: { id: parseInt(id) },
       relations: ['Organisateur', 'tickets']
     });
     if (!event) {
@@ -50,7 +62,7 @@ export class EventService {
 
   async update(id: string, updateEventDto: UpdateEventDto) {
     const event = await this.eventRepository.preload({
-      Id: +id,
+      id: +id,
       ...updateEventDto,
     });
     if (!event) {
@@ -65,12 +77,17 @@ export class EventService {
   }
 
   private async preloadOrganById(id: number): Promise<Organisateur> {
-    const organ = await this.organRepository.findOne({
-      where: { Id: id }
-    })
-    if (!organ) {
-      throw new NotFoundException(`Organisateur #${id} not found`)
+    if (id) {
+
+      const organ = await this.organRepository.findOne({
+        where: { id: id }
+      })
+      if (!organ) {
+        throw new NotFoundException(`Organisateur #${id} not found`)
+      }
+      return organ
     }
-    return organ
+    else
+      return null
   }
 }

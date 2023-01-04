@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { Admin } from './entities/admin.entity';
@@ -10,6 +10,8 @@ export class AdminService {
   constructor(
     @InjectRepository(Admin)
     private readonly adminRepository: Repository<Admin>,
+
+    private readonly connection: Connection,
   ) { }
 
   create(createAdminDto: CreateAdminDto) {
@@ -23,7 +25,7 @@ export class AdminService {
 
   async findOne(id: string) {
     const admin = await this.adminRepository.findOne({
-      where: { Id: parseInt(id) },
+      where: { id: parseInt(id) },
     });
     if (!admin) {
       throw new NotFoundException(`admin #${id}`)
@@ -33,7 +35,7 @@ export class AdminService {
 
   async update(id: string, updateAdminDto: UpdateAdminDto) {
     const admin = await this.adminRepository.preload({
-      Id: +id,
+      id: +id,
       ...updateAdminDto,
     });
     if (!admin) {

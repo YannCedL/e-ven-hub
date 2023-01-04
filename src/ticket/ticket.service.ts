@@ -22,7 +22,7 @@ export class TicketService {
   ) { }
 
   async create(createTicketDto: CreateTicketDto) {
-    const Event = await this.preloadEventById(createTicketDto.EventId)
+    const Event = await this.preloadEventById(createTicketDto.eventId)
     if (Event) {
       const ticket = this.ticketRepository.create({
         ...createTicketDto,
@@ -43,7 +43,7 @@ export class TicketService {
 
   async findOne(id: string) {
     const ticket = await this.ticketRepository.findOne({
-      where: { Id: parseInt(id) },
+      where: { id: parseInt(id) },
       relations: ['Event', 'Users']
     });
     if (!ticket) {
@@ -54,7 +54,7 @@ export class TicketService {
 
   async update(id: string, updateTicketDto: UpdateTicketDto) {
     const ticket = await this.ticketRepository.preload({
-      Id: +id,
+      id: +id,
       ...updateTicketDto,
     });
     if (!ticket) {
@@ -74,7 +74,7 @@ export class TicketService {
     const Users = await this.preloadUserById(user)
     if (ticket && Users) {
       const buy = this.ticketRepository.update(
-        ticket.Id,
+        ticket.id,
         {
           ...UpdateTicketDto,
           Users
@@ -88,7 +88,7 @@ export class TicketService {
 
   private async preloadEventById(id: number): Promise<Event> {
     const event = await this.eventRepository.findOne({
-      where: { Id: id }
+      where: { id: id }
     })
     if (!event) {
       throw new NotFoundException(`Event #${id} not found`)
@@ -103,7 +103,7 @@ export class TicketService {
 
     let result = []
     waiting.forEach(i => {
-      if (i.Users == null && i.Event.Id == event) {
+      if (i.Users == null && i.Event.id == event) {
         result.push(i)
       }
     });
@@ -115,7 +115,7 @@ export class TicketService {
 
   private async preloadUserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { Id: id }
+      where: { id: id }
     })
     if (!user) {
       throw new NotFoundException(`User #${id} not found`)

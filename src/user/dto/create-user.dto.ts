@@ -3,17 +3,17 @@ import { IsNumber, IsString } from "class-validator";
 export class CreateUserDto {
 
     @IsString()
-    Nom: string;
+    lastName: string;
 
     @IsString()
-    Prenom: string;
+    firstName: string;
 
     @IsString()
-    Mail: string;
+    mail: string;
 
     @IsString()
-    Pass: string;
+    pass: string;
 
     @IsNumber()
-    Telephone: number;
+    phone: number;
 }

@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DataQueryDto } from 'src/common/dto/data-query.dto/data-query.dto';
 import { Ticket } from 'src/ticket/entities/ticket.entity';
-import { Repository } from 'typeorm';
+import { /*Connection,*/ Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -14,12 +16,17 @@ export class UserService {
     private readonly userRepository: Repository<User>,
 
     @InjectRepository(Ticket)
-    private readonly ticketRepository: Repository<Ticket>
+    private readonly ticketRepository: Repository<Ticket>,
+    /*
+        private readonly connection: Connection,
+    */
 
   ) { }
 
-  create(createUserDto: CreateUserDto) {
-    const user = this.userRepository.create(createUserDto);
+  async create(createUserDto: CreateUserDto) {
+    const { pass } = createUserDto;
+    const hash = await bcrypt.hash(pass, 10);
+    const user = this.userRepository.create({ ...createUserDto, pass: hash });
     return this.userRepository.save(user);
   }
 
@@ -31,7 +38,7 @@ export class UserService {
 
   async findOne(id: string) {
     const user = await this.userRepository.findOne({
-      where: { Id: parseInt(id) },
+      where: { id: parseInt(id) },
       relations: ['Tickets'],
     });
     if (!user) {
@@ -42,7 +49,7 @@ export class UserService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.preload({
-      Id: +id,
+      id: +id,
       ...updateUserDto,
     });
     if (!user) {
@@ -55,4 +62,32 @@ export class UserService {
     const user = await this.findOne(id);
     return this.userRepository.remove(user)
   }
+
+  async login(body: DataQueryDto): Promise<User | undefined> {
+    const { Mail } = body
+    const user = await this.userRepository.findOne({
+      where: { mail: Mail }
+    });
+
+    if (user) {
+      return Promise.resolve(user)
+    }
+    return undefined
+  }
+  /*
+    async recommmendUser(user: User) {
+      const queryRunner = this.connection.createQueryRunner();
+  
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        queryRunner.manager.save(user);
+      }
+      catch (err) {
+        await queryRunner.rollbackTransaction();
+      }
+      finally {
+        await queryRunner.release()
+      }
+    }*/
 }

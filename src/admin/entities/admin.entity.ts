@@ -3,22 +3,22 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class Admin {
     @PrimaryGeneratedColumn()
-    Id: number;
+    id: number;
 
     @Column()
-    Name: string;
+    lastName: string;
 
     @Column()
-    Prenom: string;
+    firstName: string;
 
     @Column()
-    Mail: string;
+    mail: string;
 
     @Column()
-    Pass: string;
+    pass: string;
 
     @Column()
-    Telephone: string;
+    telephone: string;
 
 
 }

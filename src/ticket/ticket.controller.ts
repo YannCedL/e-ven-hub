@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { DataQueryDto } from 'src/common/dto/data-query.dto/data-query.dto';
+import { LocalAuthGuard } from 'src/guards/local-auth.guard';
 
 @Controller('ticket')
 export class TicketController {
@@ -32,6 +33,8 @@ export class TicketController {
   remove(@Param('id') id: string) {
     return this.ticketService.remove(id);
   }
+
+
   @Post('/buy')
   buyTicket(@Query() data: DataQueryDto) {
     return this.ticketService.buyTicket(data)
