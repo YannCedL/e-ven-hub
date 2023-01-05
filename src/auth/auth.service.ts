@@ -41,7 +41,7 @@ export class AuthService {
         const organ = await this.organService.login(body);
         const match = await bcrypt.compare(Pass, organ.pass);
 
-        if (organ && Pass === match) {
+        if (organ && match) {
             const { pass, ...result } = organ;
             return result;
         }
