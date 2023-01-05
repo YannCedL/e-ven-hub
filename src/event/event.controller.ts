@@ -4,6 +4,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Request } from '@nestjs/common/decorators';
 import { request } from 'http';
+import { DataQueryDto } from 'src/common/dto/data-query.dto/data-query.dto';
 
 @Controller('event')
 export class EventController {
@@ -19,8 +20,8 @@ export class EventController {
     return this.eventService.findAll();
   }
   @Get('/organisateur')
-  findAllMile(id: number) {
-    return this.findAllMile(id)
+  findAllMile(@Body() body: DataQueryDto) {
+    return this.eventService.findAllMine(body)
   }
 
   @Get(':id')

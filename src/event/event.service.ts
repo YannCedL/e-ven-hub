@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity'
 import { NotFoundException } from '@nestjs/common/exceptions';
 import { Organisateur } from 'src/organisateur/entities/organisateur.entity';
+import { DataQueryDto } from 'src/common/dto/data-query.dto/data-query.dto';
 
 @Injectable()
 export class EventService {
@@ -37,14 +38,15 @@ export class EventService {
     });
   }
 
-  async findAllMine(id: number) {
-    const organ = await this.preloadOrganById(id)
-    const event = await this.eventRepository.findOne({
+  async findAllMine(body: DataQueryDto) {
+    const { organisateur } = body;
+    const organ = await this.preloadOrganById(organisateur)
+    const event = await this.eventRepository.find({
       where: { Organisateur: organ },
       relations: ['Organisateur', 'tickets']
     });
     if (!event) {
-      throw new NotFoundException(`Event #${id}`)
+      throw new NotFoundException(`Organisateur #${organisateur}`)
     }
     return event;
   }

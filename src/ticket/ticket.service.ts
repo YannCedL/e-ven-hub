@@ -79,11 +79,10 @@ export class TicketService {
           ...UpdateTicketDto,
           Users
         })
-      return buy
     }
 
 
-    return test
+    return ticket
   }
 
   private async preloadEventById(id: number): Promise<Event> {

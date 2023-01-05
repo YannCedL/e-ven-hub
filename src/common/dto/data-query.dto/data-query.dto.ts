@@ -7,6 +7,11 @@ export class DataQueryDto {
 
     @IsNumber()
     @IsPositive()
+    organisateur: number;
+
+
+    @IsNumber()
+    @IsPositive()
     event: number;
 
     @IsString()

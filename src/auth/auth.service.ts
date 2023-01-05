@@ -38,11 +38,11 @@ export class AuthService {
 
     async validateOrgan(body: DataQueryDto): Promise<any> {
         const { Pass } = body
-        const user = await this.organService.login(body);
-        const match = await bcrypt.compare(Pass, user.pass);
+        const organ = await this.organService.login(body);
+        const match = await bcrypt.compare(Pass, organ.pass);
 
-        if (user && Pass === match) {
-            const { pass, ...result } = user;
+        if (organ && Pass === match) {
+            const { pass, ...result } = organ;
             return result;
         }
         return null;

@@ -36,7 +36,7 @@ export class TicketController {
 
 
   @Post('/buy')
-  buyTicket(@Query() data: DataQueryDto) {
+  buyTicket(@Body() data: DataQueryDto) {
     return this.ticketService.buyTicket(data)
   }
 }
