@@ -78,6 +78,26 @@ export class EventService {
     return this.eventRepository.remove(event)
   }
 
+  async findAllEventByUser(body: DataQueryDto) {
+    const { user } = body;
+    var table = []
+    const events = await this.eventRepository.find({
+      relations: ['tickets']
+    })
+    if (events) {
+      events.map(event => event.tickets.map(ticket => {
+
+        if (ticket.Users != null) {
+          table.push(event.id)
+        }
+
+      }
+      ))
+    }
+    return table
+
+  }
+
   private async preloadOrganById(id: number): Promise<Organisateur> {
     if (id) {
 

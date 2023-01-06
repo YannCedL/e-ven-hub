@@ -7,6 +7,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { CreateEventDto } from 'src/event/dto/create-event.dto';
+import { Event } from 'src/event/entities/event.entity';
+import { TicketService } from 'src/ticket/ticket.service';
 
 @Injectable()
 export class UserService {
@@ -15,11 +18,9 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
 
-    @InjectRepository(Ticket)
-    private readonly ticketRepository: Repository<Ticket>,
     /*
-        private readonly connection: Connection,
-    */
+         private readonly connection: Connection,
+     */
 
   ) { }
 
@@ -76,6 +77,33 @@ export class UserService {
       return Promise.resolve(user)
     }
     return undefined
+  }
+
+  async findAllTicketId(User: User) {
+    const { id } = User
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+      relations: ['Tickets']
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    let waiting1 = []
+    user.Tickets.map(ticket => { waiting1.push(ticket.id) })
+    return waiting1
+  }
+
+  async findAllTicketEvents(user: User) {
+    var table = []
+    const id = await this.findAllTicketId(user)
+    if (!id) {
+      throw new NotFoundException('this user do not participate to a event');
+    }
+    for (let i = 0; i < id.length; i++) {
+      table.push(id[i]);
+    }
+    return table + "Events";
+
   }
   /*
     async recommmendUser(user: User) {

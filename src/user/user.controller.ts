@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DataQueryDto } from 'src/common/dto/data-query.dto/data-query.dto';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -16,6 +17,11 @@ export class UserController {
   @Get()
   findAll() {
     return this.userService.findAll();
+  }
+
+  @Get('/eventPart')
+  findAllEvent(@Body() User: User) {
+    return this.userService.findAllTicketEvents(User);
   }
 
   @Get(':id')

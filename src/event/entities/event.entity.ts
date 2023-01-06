@@ -19,6 +19,12 @@ export class Event {
     @Column()
     statut: string;
 
+    @Column()
+    actif: boolean;
+
+    @Column()
+    prix: number;
+
 
 
 
