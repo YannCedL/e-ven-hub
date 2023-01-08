@@ -50,16 +50,30 @@ export class UserService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     const { pass } = updateUserDto;
-    const hash = await bcrypt.hash(pass, 10);
-    const user = await this.userRepository.preload({
-      id: +id,
-      ...updateUserDto,
-      pass: hash
-    });
-    if (!user) {
-      throw new NotFoundException(`user #${id} not found`)
+    if (pass) {
+
+      const hash = await bcrypt.hash(pass, 10);
+      const user = await this.userRepository.preload({
+        id: +id,
+        ...updateUserDto,
+        pass: hash
+      });
+      if (!user) {
+        throw new NotFoundException(`user #${id} not found`)
+      }
+      return this.userRepository.save(user)
     }
-    return this.userRepository.save(user)
+    if (!pass) {
+
+      const user = await this.userRepository.preload({
+        id: +id,
+        ...updateUserDto
+      });
+      if (!user) {
+        throw new NotFoundException(`user #${id} not found`)
+      }
+      return this.userRepository.save(user)
+    }
   }
 
   async remove(id: string) {

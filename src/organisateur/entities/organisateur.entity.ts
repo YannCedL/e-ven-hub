@@ -18,7 +18,7 @@ export class Organisateur {
     pass: string;
 
     @Column()
-    tel: number;
+    tel: string;
 
     @Column()
     adresse: string;

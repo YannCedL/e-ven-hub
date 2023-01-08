@@ -17,4 +17,8 @@ export class AuthController {
         return this.authService.loginOrgan(Body)
     }
 
+    @Post('/admin')
+    async loginAdmin(@Body() Body: DataQueryDto) {
+        return this.authService.loginAdmin(Body)
+    }
 }

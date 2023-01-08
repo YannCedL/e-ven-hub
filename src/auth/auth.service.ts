@@ -4,14 +4,25 @@ import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { OrganisateurService } from 'src/organisateur/organisateur.service';
+import { AdminService } from 'src/admin/admin.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private userService: UserService,
         private organService: OrganisateurService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private adminService: AdminService,
     ) { }
+    private readonly Admin0 = [
+        {
+            id: 0,
+            lastName: "SuperAdmin",
+            firstName: "admin",
+            mail: "superAdmin@gmail.com",
+            pass: bcrypt.hash("SuperAdmin00", 10),
+            telephone: "0102538880"
+        }]
 
 
     async validateUser(body: DataQueryDto): Promise<any> {
@@ -67,6 +78,30 @@ export class AuthService {
 
             return {
                 access_token: this.jwtService.sign(payload), organisateur: Organ
+            };
+        }
+    }
+
+    async validateAdmin(body: DataQueryDto): Promise<any> {
+        const { Pass } = body
+        const admin = await this.adminService.login(body);
+        const match = await bcrypt.compare(Pass, admin.pass);
+
+        if (admin && match) {
+            const { pass, ...result } = admin;
+            return result;
+        }
+        return null;
+
+    }
+
+    async loginAdmin(body: DataQueryDto) {
+        const admin = await this.validateAdmin(body)
+        if (admin) {
+            const payload = { username: admin.mail, sub: admin.id };
+
+            return {
+                access_token: this.jwtService.sign(payload), admin: admin
             };
         }
     }

@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport/dist/passport.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AdminService } from 'src/admin/admin.service';
+import { Admin } from 'src/admin/entities/admin.entity';
 import { Organisateur } from 'src/organisateur/entities/organisateur.entity';
 import { OrganisateurModule } from 'src/organisateur/organisateur.module';
 import { OrganisateurService } from 'src/organisateur/organisateur.service';
@@ -13,12 +15,12 @@ import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Ticket, Organisateur]), PassportModule, JwtModule.register({
+  imports: [TypeOrmModule.forFeature([User, Ticket, Organisateur, Admin]), PassportModule, JwtModule.register({
     secret: process.env.SECRETKEY,
     signOptions: { expiresIn: '24h' },
   }),],
   controllers: [AuthController],
-  providers: [AuthService, OrganisateurService, UserService, LocalStrategy],
+  providers: [AuthService, OrganisateurService, UserService, LocalStrategy, AdminService],
   exports: [AuthService]
 })
 export class AuthModule { }

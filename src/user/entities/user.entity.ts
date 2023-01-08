@@ -20,7 +20,7 @@ export class User {
     pass: string;
 
     @Column()
-    phone: number;
+    phone: string;
 
     @Column()
     actif: string;

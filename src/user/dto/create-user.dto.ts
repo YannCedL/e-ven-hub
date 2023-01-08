@@ -3,20 +3,18 @@ import { IsNumber, IsString } from "class-validator";
 export class CreateUserDto {
 
     @IsString()
-    lastName: string;
+    readonly lastName: string;
 
     @IsString()
-    firstName: string;
+    readonly firstName: string;
 
     @IsString()
-    mail: string;
+    readonly mail: string;
 
     @IsString()
-    pass: string;
+    readonly pass: string;
 
     @IsNumber()
-    phone: number;
+    readonly phone: string;
 
-    @IsString()
-    actif: string;
 }

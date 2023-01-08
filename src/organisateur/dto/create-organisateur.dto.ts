@@ -3,26 +3,24 @@ import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateOrganisateurDto {
     @IsString()
-    name: string;
+    readonly name: string;
 
     @IsString()
-    mail: string;
+    readonly mail: string;
 
     @IsString()
-    pass: string;
+    readonly pass: string;
 
     @IsNumber()
-    tel: number;
+    readonly tel: string;
 
     @IsString()
-    adresse: string;
+    readonly adresse: string;
 
     @IsString()
-    gerant: string;
+    readonly gerant: string;
 
     @IsOptional()
-    num_RCS: string;
+    readonly num_RCS: string;
 
-    @IsString()
-    actif: string;
 }
