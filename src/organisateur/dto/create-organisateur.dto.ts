@@ -22,4 +22,7 @@ export class CreateOrganisateurDto {
 
     @IsOptional()
     num_RCS: string;
+
+    @IsString()
+    actif: string;
 }

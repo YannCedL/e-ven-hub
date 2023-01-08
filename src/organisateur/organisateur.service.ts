@@ -18,7 +18,7 @@ export class OrganisateurService {
   async create(createOrganisateurDto: CreateOrganisateurDto) {
     const { pass } = createOrganisateurDto;
     const hash = await bcrypt.hash(pass, 10);
-    const organ = this.organRepository.create({ ...createOrganisateurDto, pass: hash });
+    const organ = this.organRepository.create({ ...createOrganisateurDto, pass: hash, actif: "actif" });
     return this.organRepository.save(organ);
   }
 
@@ -54,8 +54,14 @@ export class OrganisateurService {
   }
 
   async remove(id: string) {
-    const organ = await this.findOne(id);
-    return this.organRepository.remove(organ)
+    const org = await this.findOne(id);
+    const act = org.actif == "inactif" ? "actif" : "inactif"
+    const organ = await this.organRepository.preload({
+      id: +id,
+      ...org,
+      actif: act
+    });
+    return this.organRepository.save(organ)
   }
 
   async login(body: DataQueryDto): Promise<Organisateur | undefined> {

@@ -27,7 +27,7 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const { pass } = createUserDto;
     const hash = await bcrypt.hash(pass, 10);
-    const user = this.userRepository.create({ ...createUserDto, pass: hash });
+    const user = this.userRepository.create({ ...createUserDto, pass: hash, actif: "actif" });
     return this.userRepository.save(user);
   }
 
@@ -63,8 +63,15 @@ export class UserService {
   }
 
   async remove(id: string) {
-    const user = await this.findOne(id);
-    return this.userRepository.remove(user)
+    const use = await this.findOne(id);
+    const act = use.actif == "inactif" ? "actif" : "inactif"
+
+    const user = await this.userRepository.preload({
+      id: +id,
+      ...use,
+      actif: act
+    });
+    return this.userRepository.save(user)
   }
 
   async login(body: DataQueryDto): Promise<User | undefined> {

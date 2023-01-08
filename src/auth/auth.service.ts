@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataQueryDto } from 'src/common/dto/data-query.dto/data-query.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
@@ -18,11 +18,17 @@ export class AuthService {
         const { Pass } = body
         const user = await this.userService.login(body);
         const match = await bcrypt.compare(Pass, user.pass);
-        if (user && match) {
-            const { pass, ...result } = user;
-            return result;
+        if (user.actif == "actif") {
+            if (user && match) {
+                const { pass, ...result } = user;
+                return result;
+            }
+            return null;
         }
-        return null;
+        else {
+            throw new NotFoundException(`Sorry ${user.lastName} . your account is disable`)
+
+        }
     }
 
     async loginUser(user: DataQueryDto) {
@@ -41,11 +47,17 @@ export class AuthService {
         const organ = await this.organService.login(body);
         const match = await bcrypt.compare(Pass, organ.pass);
 
-        if (organ && match) {
-            const { pass, ...result } = organ;
-            return result;
+        if (organ.actif == "actif") {
+            if (organ && match && organ.actif == "actif") {
+                const { pass, ...result } = organ;
+                return result;
+            }
+            return null;
         }
-        return null;
+        else {
+            throw new NotFoundException(`Sorry ${organ.name} . your account is disable`)
+
+        }
     }
 
     async loginOrgan(organ: DataQueryDto) {

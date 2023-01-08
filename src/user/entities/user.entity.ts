@@ -22,6 +22,9 @@ export class User {
     @Column()
     phone: number;
 
+    @Column()
+    actif: string;
+
     @JoinTable()
     @OneToMany(type => Ticket, ticket => ticket.Users)
     Tickets: Ticket[];

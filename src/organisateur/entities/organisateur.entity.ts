@@ -29,6 +29,9 @@ export class Organisateur {
     @Column()
     num_RCS: string;
 
+    @Column()
+    actif: string;
+
     @JoinTable()
     @OneToMany(type => Event, event => event.Organisateur)
     Events: Event[]

@@ -16,4 +16,7 @@ export class CreateUserDto {
 
     @IsNumber()
     phone: number;
+
+    @IsString()
+    actif: string;
 }
