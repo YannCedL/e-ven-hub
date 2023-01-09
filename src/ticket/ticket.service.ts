@@ -43,7 +43,6 @@ export class TicketService {
 
   async findEventbyUser(body: DataQueryDto) {
     const { user } = body
-    var x = 0;
     var ticket1 = []
     var ticket = []
     const wait = this.findAll();
@@ -53,31 +52,10 @@ export class TicketService {
           ticket1.push(tick.Event)
       }
     })
-    var ticket2 = this.eventRepository.find()
-    const num = (await ticket2).length
     var cache = {};
     ticket = ticket1.filter(function (elem, index, array) {
       return cache[elem.id] ? 0 : cache[elem.id] = 1;
     });
-    /*
-    for (let i = 0; i < ticket1.length; i++) {
-      for (let j = 0; j < num; j++) {
-        if ((await ticket2).at(j).id === ticket1[i].id && ticket[0] == null) {
-          ticket.push((await ticket2).at(j))
-          x++
-        }
-        if (ticket[0] != null) {
-          for (let k = 0; k < ticket.length; k++) {
-            if (ticket[k].id != (await ticket2).at(j).id) {
-              ticket.push((await ticket2).at(j))
-              
-            }
-          }
-          
-        }
-        
-      }
-    }*/
     return ticket
   }
 
@@ -114,7 +92,7 @@ export class TicketService {
     const ticket = await this.preloadTicketBuy(event)
     const Users = await this.preloadUserById(user)
     if (ticket && Users) {
-      const buy = this.ticketRepository.update(
+      this.ticketRepository.update(
         ticket.id,
         {
           ...UpdateTicketDto,
@@ -124,6 +102,23 @@ export class TicketService {
 
 
     return `Thanks to buy the ticket ${ticket} . See you at the event`
+  }
+
+  async allUsersByEvent(event: number) {
+    const waiting = await this.ticketRepository.find({
+      relations: ['Event', 'Users']
+    })
+
+    let result = []
+    waiting.forEach(i => {
+      if (i.Users != null && i.Event.id == event) {
+        result.push(i)
+      }
+    });
+    if (result == null) {
+      throw new NotFoundException(`Sorry you haven't a ticket buyed`)
+    }
+    return result[0]
   }
 
   private async preloadEventById(id: number): Promise<Event> {
@@ -162,4 +157,6 @@ export class TicketService {
     }
     return user
   }
+
+
 }

@@ -29,6 +29,9 @@ export class EventService {
       return this.eventRepository.save(event);
 
     }
+    else {
+      throw new NotFoundException('Sorry you can not creat a event if you are not au Organisateur')
+    }
 
   }
 
@@ -63,19 +66,38 @@ export class EventService {
   }
 
   async update(id: string, updateEventDto: UpdateEventDto) {
-    const event = await this.eventRepository.preload({
-      id: +id,
-      ...updateEventDto,
-    });
-    if (!event) {
-      throw new NotFoundException(`Event #${id} not found`)
+    const Event = await this.findOne(id)
+    const tickets = Event.tickets.map(ticket => { if (ticket.Users != null) { return false } })
+    if (tickets) {
+      const event = await this.eventRepository.preload({
+        id: +id,
+        ...updateEventDto,
+      });
+      if (!event) {
+        throw new NotFoundException(`Event #${id} not found`)
+      }
+      return this.eventRepository.save(event)
     }
-    return this.eventRepository.save(event)
+    else {
+      throw new NotFoundException(`Sorry you can't update event ${Event.title} beacause a user buy a ticket`)
+    }
   }
 
   async remove(id: string) {
     const event = await this.findOne(id);
-    return this.eventRepository.remove(event)
+    if (event) {
+      const remEvent = !event.actif
+      const Event = await this.eventRepository.preload({
+        id: +id,
+        ...event,
+        actif: remEvent
+      })
+      return this.eventRepository.save(Event)
+    }
+    else {
+      throw new NotFoundException(`Event #${id} not found`)
+
+    }
   }
 
   async findAllEventByUser(body: DataQueryDto) {

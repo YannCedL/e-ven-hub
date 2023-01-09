@@ -52,16 +52,30 @@ export class OrganisateurService {
 
   async update(id: string, updateOrganisateurDto: UpdateOrganisateurDto) {
     const { pass } = updateOrganisateurDto;
-    const hash = await bcrypt.hash(pass, 10);
-    const organ = await this.organRepository.preload({
-      id: +id,
-      ...updateOrganisateurDto,
-      pass: hash
-    });
-    if (!organ) {
-      throw new NotFoundException(`organ #${id} not found`)
+    if (pass) {
+
+      const hash = await bcrypt.hash(pass, 10);
+      const organ = await this.organRepository.preload({
+        id: +id,
+        ...updateOrganisateurDto,
+        pass: hash
+      });
+      if (!organ) {
+        throw new NotFoundException(`organ #${id} not found`)
+      }
+      return this.organRepository.save(organ)
     }
-    return this.organRepository.save(organ)
+
+    if (!pass) {
+      const organ = await this.organRepository.preload({
+        id: +id,
+        ...updateOrganisateurDto
+      });
+      if (!organ) {
+        throw new NotFoundException(`organ #${id} not found`)
+      }
+      return this.organRepository.save(organ)
+    }
   }
 
   async remove(id: string) {
