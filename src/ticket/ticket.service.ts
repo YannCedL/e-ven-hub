@@ -113,7 +113,7 @@ export class TicketService {
     let result = []
     waiting.forEach(i => {
       if (i.Users != null && i.Event.id == event) {
-        result.push(i)
+        result.push(i.Users)
       }
     });
     if (result == null) {
