@@ -24,6 +24,11 @@ export class TicketController {
     return this.ticketService.findEventbyUser(body)
   }
 
+  @Get('/event')
+  findAllUserByEvent(@Body() body: DataQueryDto) {
+    return this.ticketService.allUsersByEvent(body)
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ticketService.findOne('' + id);

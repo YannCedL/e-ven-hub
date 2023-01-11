@@ -104,7 +104,8 @@ export class TicketService {
     return `Thanks to buy the ticket ${ticket} . See you at the event`
   }
 
-  async allUsersByEvent(event: number) {
+  async allUsersByEvent(body: DataQueryDto) {
+    const { event } = body
     const waiting = await this.ticketRepository.find({
       relations: ['Event', 'Users']
     })
@@ -118,7 +119,7 @@ export class TicketService {
     if (result == null) {
       throw new NotFoundException(`Sorry you haven't a ticket buyed`)
     }
-    return result[0]
+    return result
   }
 
   private async preloadEventById(id: number): Promise<Event> {
