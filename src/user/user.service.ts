@@ -48,6 +48,25 @@ export class UserService {
     return user;
   }
 
+  async resetPassword(updateUserDto: UpdateUserDto) {
+    const { pass, mail } = updateUserDto
+    if (mail) {
+
+      const user = await this.userRepository.findOne({
+        where: { mail: mail }
+      })
+      if (user) {
+        const hash = await bcrypt.hash(pass, 10);
+        user.pass = hash
+        return this.userRepository.save(user)
+      }
+      else throw new NotFoundException(`user #${mail} not found`)
+    }
+    else throw new NotFoundException(` #${mail} not found`)
+
+
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     const { pass } = updateUserDto;
     if (pass) {
