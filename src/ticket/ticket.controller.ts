@@ -19,12 +19,12 @@ export class TicketController {
     return this.ticketService.findAll();
   }
 
-  @Get('/user')
+  @Post('/user')
   findAllUsers(@Body() body: DataQueryDto) {
     return this.ticketService.findEventbyUser(body)
   }
 
-  @Get('/event')
+  @Post('/event')
   findAllUserByEvent(@Body() body: DataQueryDto) {
     return this.ticketService.allUsersByEvent(body)
   }
