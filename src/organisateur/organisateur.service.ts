@@ -50,6 +50,25 @@ export class OrganisateurService {
     return organ;
   }
 
+  async resetPassword(updateOrgDto: UpdateOrganisateurDto) {
+    const { pass, mail } = updateOrgDto
+    if (mail) {
+
+      const user = await this.organRepository.findOne({
+        where: { mail: mail }
+      })
+      if (user) {
+        const hash = await bcrypt.hash(pass, 10);
+        user.pass = hash
+        return this.organRepository.save(user)
+      }
+      else throw new NotFoundException(`user #${mail} not found`)
+    }
+    else throw new NotFoundException(` #${mail} not found`)
+
+
+  }
+
   async update(id: string, updateOrganisateurDto: UpdateOrganisateurDto) {
     const { pass } = updateOrganisateurDto;
     if (pass) {

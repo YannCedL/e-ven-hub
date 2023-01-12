@@ -27,6 +27,11 @@ export class OrganisateurController {
     return this.organisateurService.update(id, updateOrganisateurDto);
   }
 
+  @Post('/change')
+  reset(@Body() updateUserDto: UpdateOrganisateurDto) {
+    return this.organisateurService.resetPassword(updateUserDto);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.organisateurService.remove(id);

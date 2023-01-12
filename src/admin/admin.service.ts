@@ -38,6 +38,26 @@ export class AdminService {
     return admin;
   }
 
+
+  async resetPassword(updateadminDto: UpdateAdminDto) {
+    const { pass, mail } = updateadminDto
+    if (mail) {
+
+      const user = await this.adminRepository.findOne({
+        where: { mail: mail }
+      })
+      if (user) {
+        const hash = await bcrypt.hash(pass, 10);
+        user.pass = hash
+        return this.adminRepository.save(user)
+      }
+      else throw new NotFoundException(`user #${mail} not found`)
+    }
+    else throw new NotFoundException(` #${mail} not found`)
+
+
+  }
+
   async update(id: string, updateAdminDto: UpdateAdminDto) {
     const admin = await this.adminRepository.preload({
       id: +id,
