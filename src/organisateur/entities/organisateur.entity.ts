@@ -4,30 +4,33 @@ import { Column, Entity, JoinTable, OneToMany, PrimaryGeneratedColumn } from "ty
 @Entity()
 export class Organisateur {
     @PrimaryGeneratedColumn()
-    Id: number;
+    id: number;
 
     @Column({
         unique: true
     })
-    Nom: string;
+    name: string;
 
     @Column()
-    Mail: string;
+    mail: string;
 
     @Column()
-    Pass: string;
+    pass: string;
 
     @Column()
-    Tel: number;
+    tel: string;
 
     @Column()
-    Adresse: string;
+    adresse: string;
 
     @Column()
-    Gerant: string;
+    gerant: string;
 
     @Column()
-    Num_RCS: string;
+    num_RCS: string;
+
+    @Column()
+    actif: string;
 
     @JoinTable()
     @OneToMany(type => Event, event => event.Organisateur)

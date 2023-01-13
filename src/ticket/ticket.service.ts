@@ -22,7 +22,7 @@ export class TicketService {
   ) { }
 
   async create(createTicketDto: CreateTicketDto) {
-    const Event = await this.preloadEventById(createTicketDto.EventId)
+    const Event = await this.preloadEventById(createTicketDto.eventId)
     if (Event) {
       const ticket = this.ticketRepository.create({
         ...createTicketDto,
@@ -41,9 +41,28 @@ export class TicketService {
 
   }
 
+  async findEventbyUser(body: DataQueryDto) {
+    const { user } = body
+    var ticket1 = []
+    var ticket = []
+    const wait = this.findAll();
+    (await wait).map(tick => {
+      if (tick.Users) {
+        if (tick.Users.id == user)
+          ticket1.push(tick.Event)
+      }
+    })
+    var cache = {};
+    ticket = ticket1.filter(function (elem, index, array) {
+      return cache[elem.id] ? 0 : cache[elem.id] = 1;
+    });
+    return ticket
+  }
+
+
   async findOne(id: string) {
     const ticket = await this.ticketRepository.findOne({
-      where: { Id: parseInt(id) },
+      where: { id: parseInt(id) },
       relations: ['Event', 'Users']
     });
     if (!ticket) {
@@ -54,7 +73,7 @@ export class TicketService {
 
   async update(id: string, updateTicketDto: UpdateTicketDto) {
     const ticket = await this.ticketRepository.preload({
-      Id: +id,
+      id: +id,
       ...updateTicketDto,
     });
     if (!ticket) {
@@ -73,22 +92,39 @@ export class TicketService {
     const ticket = await this.preloadTicketBuy(event)
     const Users = await this.preloadUserById(user)
     if (ticket && Users) {
-      const buy = this.ticketRepository.update(
-        ticket.Id,
+      this.ticketRepository.update(
+        ticket.id,
         {
           ...UpdateTicketDto,
           Users
         })
-      return buy
     }
 
 
-    return test
+    return `Thanks to buy the ticket ${ticket.id} . See you at the event`
+  }
+
+  async allUsersByEvent(body: DataQueryDto) {
+    const { event } = body
+    const waiting = await this.ticketRepository.find({
+      relations: ['Event', 'Users']
+    })
+
+    let result = []
+    waiting.forEach(i => {
+      if (i.Users != null && i.Event.id == event) {
+        result.push(i.Users)
+      }
+    });
+    if (result == null) {
+      throw new NotFoundException(`Sorry you haven't a ticket buyed`)
+    }
+    return result
   }
 
   private async preloadEventById(id: number): Promise<Event> {
     const event = await this.eventRepository.findOne({
-      where: { Id: id }
+      where: { id: id }
     })
     if (!event) {
       throw new NotFoundException(`Event #${id} not found`)
@@ -103,7 +139,7 @@ export class TicketService {
 
     let result = []
     waiting.forEach(i => {
-      if (i.Users == null && i.Event.Id == event) {
+      if (i.Users == null && i.Event.id == event) {
         result.push(i)
       }
     });
@@ -115,11 +151,13 @@ export class TicketService {
 
   private async preloadUserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { Id: id }
+      where: { id: id }
     })
     if (!user) {
       throw new NotFoundException(`User #${id} not found`)
     }
     return user
   }
+
+
 }

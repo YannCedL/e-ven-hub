@@ -5,22 +5,25 @@ import { Ticket } from "src/ticket/entities/ticket.entity";
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
-    Id: number;
+    id: number;
 
     @Column()
-    Nom: string;
+    lastName: string;
 
     @Column()
-    Prenom: string;
+    firstName: string;
+
+    @Column({ unique: true })
+    mail: string;
 
     @Column()
-    Mail: string;
+    pass: string;
 
     @Column()
-    Pass: string;
+    phone: string;
 
     @Column()
-    Telephone: number;
+    actif: string;
 
     @JoinTable()
     @OneToMany(type => Ticket, ticket => ticket.Users)
