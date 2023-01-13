@@ -21,4 +21,13 @@ export class AuthController {
     async loginAdmin(@Body() Body: DataQueryDto) {
         return this.authService.loginAdmin(Body)
     }
+
+    @Post('/Supadmin')
+    async loginSupAdmi(@Body() Body: DataQueryDto) {
+        return this.authService.loginSupAdmin(Body)
+    }
+    @Post('/Supadmin/change')
+    async resetPass(@Body() Body: DataQueryDto) {
+        return this.authService.resetPassword(Body)
+    }
 }

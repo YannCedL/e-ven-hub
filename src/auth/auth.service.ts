@@ -20,9 +20,45 @@ export class AuthService {
             lastName: "SuperAdmin",
             firstName: "admin",
             mail: "superAdmin@gmail.com",
-            pass: bcrypt.hash("SuperAdmin00", 10),
+            pass: "SuperAdmin00",
             telephone: "0102538880"
         }]
+
+
+    async resetPassword(body: DataQueryDto) {
+        const { Pass, Mail } = body
+        if (Mail == this.Admin0[0].mail) {
+
+            this.Admin0[0].pass = Pass
+        }
+        else throw new NotFoundException(` #${this.Admin0[0].mail} not found`)
+    }
+
+
+
+    async validateSupAdmin(body: DataQueryDto): Promise<any> {
+        const { Mail, Pass } = body
+        if (Mail == this.Admin0[0].mail) {
+            //const match = await bcrypt.compare(Pass, this.Admin0[0].pass);
+            if (Pass == this.Admin0[0].pass) {
+                const { pass, ...result } = this.Admin0[0];
+                return result;
+            }
+            return null;
+
+        }
+    }
+
+    async loginSupAdmin(body: DataQueryDto) {
+        const User = await this.validateSupAdmin(body)
+        if (User) {
+            const payload = { username: User.mail, sub: User.id };
+
+            return {
+                access_token: this.jwtService.sign(payload), SuperAdmin: User
+            };
+        }
+    }
 
 
     async validateUser(body: DataQueryDto): Promise<any> {
