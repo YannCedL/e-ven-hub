@@ -101,7 +101,7 @@ export class TicketService {
     }
 
 
-    return `Thanks to buy the ticket ${ticket} . See you at the event`
+    return `Thanks to buy the ticket ${ticket.id} . See you at the event`
   }
 
   async allUsersByEvent(body: DataQueryDto) {
