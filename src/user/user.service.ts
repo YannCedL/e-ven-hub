@@ -1,10 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DataQueryDto } from 'src/common/dto/data-query.dto/data-query.dto';
 import { Ticket } from 'src/ticket/entities/ticket.entity';
-import { Repository } from 'typeorm';
+import { /*Connection,*/ Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
+import { CreateEventDto } from 'src/event/dto/create-event.dto';
+import { Event } from 'src/event/entities/event.entity';
+import { TicketService } from 'src/ticket/ticket.service';
 
 @Injectable()
 export class UserService {
@@ -13,13 +18,16 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
 
-    @InjectRepository(Ticket)
-    private readonly ticketRepository: Repository<Ticket>
+    /*
+         private readonly connection: Connection,
+     */
 
   ) { }
 
-  create(createUserDto: CreateUserDto) {
-    const user = this.userRepository.create(createUserDto);
+  async create(createUserDto: CreateUserDto) {
+    const { pass } = createUserDto;
+    const hash = await bcrypt.hash(pass, 10);
+    const user = this.userRepository.create({ ...createUserDto, pass: hash, actif: "actif" });
     return this.userRepository.save(user);
   }
 
@@ -31,7 +39,7 @@ export class UserService {
 
   async findOne(id: string) {
     const user = await this.userRepository.findOne({
-      where: { Id: parseInt(id) },
+      where: { id: parseInt(id) },
       relations: ['Tickets'],
     });
     if (!user) {
@@ -40,19 +48,117 @@ export class UserService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.userRepository.preload({
-      Id: +id,
-      ...updateUserDto,
-    });
-    if (!user) {
-      throw new NotFoundException(`user #${id} not found`)
+  async resetPassword(updateUserDto: UpdateUserDto) {
+    const { pass, mail } = updateUserDto
+    if (mail) {
+
+      const user = await this.userRepository.findOne({
+        where: { mail: mail }
+      })
+      if (user) {
+        const hash = await bcrypt.hash(pass, 10);
+        user.pass = hash
+        return this.userRepository.save(user)
+      }
+      else throw new NotFoundException(`user #${mail} not found`)
     }
-    return this.userRepository.save(user)
+    else throw new NotFoundException(` #${mail} not found`)
+
+
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const { pass } = updateUserDto;
+    if (pass) {
+
+      const hash = await bcrypt.hash(pass, 10);
+      const user = await this.userRepository.preload({
+        id: +id,
+        ...updateUserDto,
+        pass: hash
+      });
+      if (!user) {
+        throw new NotFoundException(`user #${id} not found`)
+      }
+      return this.userRepository.save(user)
+    }
+    if (!pass) {
+
+      const user = await this.userRepository.preload({
+        id: +id,
+        ...updateUserDto
+      });
+      if (!user) {
+        throw new NotFoundException(`user #${id} not found`)
+      }
+      return this.userRepository.save(user)
+    }
   }
 
   async remove(id: string) {
-    const user = await this.findOne(id);
-    return this.userRepository.remove(user)
+    const use = await this.findOne(id);
+    const act = use.actif == "inactif" ? "actif" : "inactif"
+
+    const user = await this.userRepository.preload({
+      id: +id,
+      ...use,
+      actif: act
+    });
+    return this.userRepository.save(user)
   }
+
+  async login(body: DataQueryDto): Promise<User | undefined> {
+    const { Mail } = body
+    const user = await this.userRepository.findOne({
+      where: { mail: Mail }
+    });
+
+    if (user) {
+      return Promise.resolve(user)
+    }
+    return undefined
+  }
+
+  async findAllTicketId(User: User) {
+    const { id } = User
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+      relations: ['Tickets']
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    let waiting1 = []
+    user.Tickets.map(ticket => { waiting1.push(ticket.id) })
+    return waiting1
+  }
+
+  async findAllTicketEvents(user: User) {
+    var table = []
+    const id = await this.findAllTicketId(user)
+    if (!id) {
+      throw new NotFoundException('this user do not participate to a event');
+    }
+    for (let i = 0; i < id.length; i++) {
+      table.push(id[i]);
+    }
+    return table + "Events";
+
+  }
+  /*
+    async recommmendUser(user: User) {
+      const queryRunner = this.connection.createQueryRunner();
+  
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        queryRunner.manager.save(user);
+      }
+      catch (err) {
+        await queryRunner.rollbackTransaction();
+      }
+      finally {
+        await queryRunner.release()
+      }
+    }*/
 }

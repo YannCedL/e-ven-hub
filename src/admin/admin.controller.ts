@@ -27,6 +27,12 @@ export class AdminController {
     return this.adminService.update(id, updateAdminDto);
   }
 
+
+  @Post('/change')
+  reset(@Body() updateUserDto: UpdateAdminDto) {
+    return this.adminService.resetPassword(updateUserDto);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.adminService.remove(id);
